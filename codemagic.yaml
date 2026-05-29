@@ -11,6 +11,13 @@ workflows:
       - name: Get Flutter packages
         script: flutter pub get
       - name: Build unsigned IPA
-        script: flutter build ipa --no-codesign
+        script: |
+          flutter build ipa --no-codesign
+          # Flutter 3.44+ skips IPA packaging when --no-codesign is used.
+          # Manually package the .app from the xcarchive into a valid IPA.
+          mkdir -p build/ios/ipa/Payload
+          cp -r build/ios/archive/Runner.xcarchive/Products/Applications/Runner.app build/ios/ipa/Payload/
+          cd build/ios/ipa
+          zip -r TimecardUtility-unsigned.ipa Payload
     artifacts:
-      - build/ios/ipa/*.ipa
+      - build/ios/ipa/TimecardUtility-unsigned.ipa
