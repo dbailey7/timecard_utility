@@ -89,22 +89,23 @@ class TimecardNotifier extends ChangeNotifier {
   // ── Elapsed Time ──────────────────────────────────────────────────────────
 
   void _convertElapsedTime(String raw) {
-    final List<String> tokens = raw.trim().split(RegExp(r'\s+'));
-    if (tokens.length != 3) {
+    // Accept formats: H:MM[AM|PM] [+] decimal  — space before AM/PM optional,
+    // separator between AM/PM and duration may be space, +, or space+plus+space.
+    final RegExp pattern = RegExp(
+      r'^(\d+:\d+(?::\d+)?)\s*(AM|PM)\s*\+?\s*(\d+\.?\d*)$',
+      caseSensitive: false,
+    );
+    final Match? m = pattern.firstMatch(raw.trim());
+    if (m == null) {
       toastMessage = 'Elapsed time format: HH:MM AM 0.5  or  HH:MM:SS PM 1.25';
       notifyListeners();
       return;
     }
 
-    final String timePart     = tokens[0];
-    final String ampmPart     = tokens[1].toUpperCase();
-    final String durationPart = tokens[2];
+    final String timePart     = m.group(1)!;
+    final String ampmPart     = m.group(2)!.toUpperCase();
+    final String durationPart = m.group(3)!;
 
-    if (ampmPart != 'AM' && ampmPart != 'PM') {
-      toastMessage = 'Second token must be AM or PM';
-      notifyListeners();
-      return;
-    }
     final bool isPm = ampmPart == 'PM';
 
     final List<String> timeParts = timePart.split(':');
