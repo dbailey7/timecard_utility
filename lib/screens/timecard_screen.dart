@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -153,7 +154,7 @@ class _TimecardScreenState extends State<TimecardScreen> {
                       horizontal: 16, vertical: 8),
                   child: TextField(
                     controller: notifier.controller,
-                    readOnly: true,       // prevents system keyboard
+                    readOnly: !kIsWeb && defaultTargetPlatform == TargetPlatform.windows ? false : true,  // allow keyboard on Windows; custom keypad on mobile
                     showCursor: true,
                     style: const TextStyle(
                       fontSize: 18,
